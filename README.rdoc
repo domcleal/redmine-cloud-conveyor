@@ -1,3 +1,47 @@
-= cloud_conveyor
+= Cloud Conveyor: A Redmine Plugin for storing attachments on Rackspace Cloud Files.
 
-Description goes here
+
+== Description
+This is a plugin for Redmine [http://www.redmine.org] that stores all your  attachments on Rackspace Cloud Files. 
+
+Sign-up for service here: https://www.rackspacecloud.com/signup.  After you're enrolled you'll need to login to the management portal here: https://manage.rackspacecloud.com to get you API access key, so that Cloud Conveyor can read and write files to your account.
+
+Find out more about the service here: http://www.rackspacecloud.com/cloud_hosting_products/files.
+
+This plugin currently depends on having the ruby-cloudfiles API installed on the machine hosting Redmine.  This is available as a standalone installation as well as a Ruby Gem located here: http://github.com/rackspace/ruby-cloudfiles
+
+Currently this plugin handles saving, deleting, reading, and downloading all attachment types as though they were stored locally.
+
+Text files and Diff files are streamed down and fed to the built in Redmine file viewers, and the Download buttons work as you would expect.  Images are displayed inline, and other binary files (.zip, .pdf, .gz, etc.) all start downloading immediately and are streamed to you from Cloud Files through Redmine without having to load the whole thing at once.  Streaming the files means you don't have to make your Rackspace containers publicly visible or accessible, and lets you rely on Redmine's security/file-access model.
+
+The only time the attachment files touch touch the media on the Redmine host at the moment is during upload.  I had set it up to be buffered and forwarded like the downloads/reads are, but the user experience wasn't much improved because of how Rails handles file uploads generally.  For now it uploads the file to a temp file, gets the MD5 sum, sends the file to Cloud Files, and then deletes the temp file from the Redmine host.  For most use-cases it's barely noticeable, and it's only a minor annoyance for larger files (20MB+).
+
+Configuration is handled by a YAML configuration file, there's an example version stored at config/cloud_conveyor.yml.example with the plugin.
+
+
+== Installation
+1. Install Redmine, and cd yourself into Redmine's root directory.
+2. hg clone  vendor/plugins/redmine_cloud_conveyor
+3. cp vendor/plugins/redmine_cloud_conveyor/config/cloud_conveyor.yml.example config/cloud_conveyor.yml
+4. Open config/cloud_conveyor.yml in your preferred editor.
+5. Set the appropriate values for:
+    api_key:  (this is the API key for your Rackspace Cloud services account)
+    username:  (this is your Rackspace Cloud services username)
+    container_name:  (this is the Cloud Files container that will hold all your Redmine attachments)
+    enabled:  (this just tells the plugin whether or not to override Redmine's default attachment storage behavior)
+6. Restart the Redmine Rails app (restart your web daemon, or whatever else you need to do)
+
+Note: The first time you successfully connect to your Cloud Files account with this plugin it will attempt to automatically create the Cloud Files container that you specify in the cloud_conveyor.yml file.
+
+
+== Known Issues
+1. I know, I know.  It would be ideal if there wasn't an intermediate temp file on upload.  It'd safe time, and improve the user experience a bit.
+
+
+== Future Improvements
+1. Removing the need for the intermediate temp file on upload.
+2. Adding an administrative panel to the GUI for easier configuration.
+3. Create a rake task that will sync files between the server and Cloud Files   when the user toggles this plugin on and off.
+
+== Bugs, Feedback and Feature Requests
+Please post all issues, praises, and insights here: 

@@ -1,11 +1,11 @@
 production:
-  api_key: 
-  username: 
+  api_key: QWERTYUIOPASDFGHJKLMNBVCXZ
+  username: your_name
   container_name: redmine
   enabled: false
 
 development:
-  api_key: 
-  username: 
+  api_key: QWERTYUIOPASDFGHJKLMNBVCXZ
+  username: your_name
   container_name: redmine_devel
   enabled: false
