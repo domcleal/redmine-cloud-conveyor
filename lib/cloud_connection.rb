@@ -1,5 +1,4 @@
 require 'cloudfiles'
-
 module CloudConveyor
   class Connection
     @@api_key           = nil
@@ -10,14 +9,16 @@ module CloudConveyor
     @@connection        = nil
     @@container         = nil
     
-    def self.initialize()
+    def self.init()
       options = YAML::load( File.open(File.join(Rails.root, 'config', 'cloud_conveyor.yml')) )
       @@api_key = options[Rails.env]['api_key']
       @@username  = options[Rails.env]['username']
       @@container_name = options[Rails.env]['container_name']
       @@enabled = options[Rails.env]['enabled']
-      
-      init_container()
+      if @@enabled 
+        connection()
+        init_container()
+      end
     end
 
     def self.api_key()
@@ -37,8 +38,8 @@ module CloudConveyor
     end
     
     def self.connection()
-      if @@conection == nil && @@enabled 
-        @@conection = CloudFiles::Connection.new(@@username, @@api_key)
+      if @@connection == nil && @@enabled 
+        @@connection = CloudFiles::Connection.new(@@username, @@api_key)
       end
       return @@connection
     end
