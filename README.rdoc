@@ -1,8 +1,27 @@
-= Cloud Conveyor: A Redmine Plugin for storing attachments on Rackspace Cloud Files.
+# Cloud Conveyor - Cloud Files storage plugin for Redmine
+# Copyright (C) 2010  Nathan Aschbacher - Cell Sixty-One
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+= Cloud Conveyor = 
+A Redmine Plugin for storing attachments on Rackspace Cloud Files.
 
 
 == Description
-This is a plugin for Redmine [http://www.redmine.org] that stores all your  attachments on Rackspace Cloud Files. 
+This is a plugin for Redmine (http://www.redmine.org) that stores all your  attachments on Rackspace Cloud Files. 
 
 Sign-up for service here: https://www.rackspacecloud.com/signup.  After you're enrolled you'll need to login to the management portal here: https://manage.rackspacecloud.com to get you API access key, so that Cloud Conveyor can read and write files to your account.
 
@@ -21,7 +40,7 @@ Configuration is handled by a YAML configuration file, there's an example versio
 
 == Installation
 1. Install Redmine, and cd yourself into Redmine's root directory.
-2. hg clone  vendor/plugins/redmine_cloud_conveyor
+2. hg clone https://nathan_aschbacher@bitbucket.org/nathan_aschbacher/redmine-cloud-conveyor vendor/plugins/redmine_cloud_conveyor
 3. cp vendor/plugins/redmine_cloud_conveyor/config/cloud_conveyor.yml.example config/cloud_conveyor.yml
 4. Open config/cloud_conveyor.yml in your preferred editor.
 5. Set the appropriate values for:
@@ -41,7 +60,9 @@ Note: The first time you successfully connect to your Cloud Files account with t
 == Future Improvements
 1. Removing the need for the intermediate temp file on upload.
 2. Adding an administrative panel to the GUI for easier configuration.
-3. Create a rake task that will sync files between the server and Cloud Files   when the user toggles this plugin on and off.
+3. Create a rake task that will sync files between the server and Cloud Files when the user toggles this plugin on and off.
+4. Setup Cloud Conveyor as a Ruby Gem
+5. Bundle the ruby-cloudfiles API directly with Cloud Conveyor to remove the external dependency.
 
 == Bugs, Feedback and Feature Requests
-Please post all issues, praises, and insights here: 
+Please post all issues, praises, and insights here: http://bitbucket.org/nathan_aschbacher/redmine-cloud-conveyor/issues/new
