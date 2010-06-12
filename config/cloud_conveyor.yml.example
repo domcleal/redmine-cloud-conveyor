@@ -1,0 +1,11 @@
+production:
+  api_key: 
+  username: 
+  container_name: redmine
+  enabled: false
+
+development:
+  api_key: 
+  username: 
+  container_name: redmine_devel
+  enabled: false

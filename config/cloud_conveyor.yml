@@ -1,0 +1,11 @@
+production:
+  api_key: 564446244a6e92926b83ef8ce3347786
+  username: naschbac
+  container_name: redmine
+  enabled: false
+
+development:
+  api_key: 564446244a6e92926b83ef8ce3347786
+  username: naschbac
+  container_name: redmine_devel
+  enabled: true
