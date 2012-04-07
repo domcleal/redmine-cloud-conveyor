@@ -17,22 +17,35 @@
 
 module CloudConveyor
   module CloudAttachmentsController
-    def self.included(base)
+    def self.included(base) # :nodoc:
       base.extend(ClassMethods)
       base.send(:include, InstanceMethods)
     
+      # Same as typing in the class 
       base.class_eval do
-        unloadable
+        unloadable # Send unloadable so it will not be unloaded in development
         
         def show
-          if @attachment.is_diff?
-            @diff = cf_object = CloudConveyor::Connection.container().object(@attachment.disk_filename).data
-            render :action => 'diff'
-          elsif @attachment.is_text? && @attachment.filesize <= Setting.file_max_size_displayed.to_i.kilobyte
-            @content = cf_object = CloudConveyor::Connection.container().object(@attachment.disk_filename).data
-            render :action => 'file'
-          else
-            download
+          respond_to do |format| 
+          format.html {
+            if @attachment.is_diff?
+              @diff = cf_object = CloudConveyor::Connection.container().object(@attachment.disk_filename).data
+              @diff_type = params[:type] || User.current.pref[:diff_type] || 'inline'
+              @diff_type = 'inline' unless %w(inline sbs).include?(@diff_type)
+              # Save diff type as user preference
+              if User.current.logged? && @diff_type != User.current.pref[:diff_type]
+                User.current.pref[:diff_type] = @diff_type
+                User.current.preference.save
+              end
+              render :action => 'diff'
+            elsif @attachment.is_text? && @attachment.filesize <= Setting.file_max_size_displayed.to_i.kilobyte
+              @content = cf_object = CloudConveyor::Connection.container().object(@attachment.disk_filename).data
+              render :action => 'file'
+            else
+              download
+            end
+          }
+          format.api
           end
         end
         

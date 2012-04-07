@@ -29,7 +29,7 @@ Dispatcher.to_prepare :redmine_cloud_conveyor do
       Attachment.send(:include, CloudConveyor::CloudAttachment)
     end
 
-    require_dependency(Redmine::VERSION.to_a.slice(0,3).join('.') > '0.8.4' ? 'application_controller' : 'application')
+    require_dependency(Redmine::VERSION.to_a.slice(0,3).join('.') > '1.2.0' ? 'application_controller' : 'application')
     require_dependency 'attachments_controller'
     unless AttachmentsController.included_modules.include? CloudConveyor::CloudAttachmentsController
       AttachmentsController.send(:include, CloudConveyor::CloudAttachmentsController)
@@ -41,6 +41,6 @@ end
 Redmine::Plugin.register :redmine_cloud_conveyor do
   name 'Redmine Cloud Conveyor'
   author 'Nathan Aschbacher @ Cell Sixty-One'
-  description 'Store all your Redmine attachments on RackSpace Cloud Files.'
-  version '0.0.1'
+  description 'Store all your Redmine attachments on RackSpace Cloud Files. (updated for Redmine > 1.2.0)'
+  version '0.0.2'
 end

@@ -17,14 +17,15 @@
 
 module CloudConveyor
   module CloudAttachment
-    def self.included(base)
+    def self.included(base) # :nodoc:
       base.extend(ClassMethods)
       base.send(:include, InstanceMethods)
           
+      # Same as typing in the class 
       base.class_eval do
-        unloadable 
+        unloadable # Send unloadable so it will not be unloaded in development
 
-        def before_save
+        def files_to_final_location
           if @temp_file && (@temp_file.size > 0)
             logger.info("saving '#{self.diskfile}' temporarily to disk")
             md5 = Digest::MD5.new
@@ -36,13 +37,17 @@ module CloudConveyor
               end
             end
             self.digest = md5.hexdigest
-
-            logger.info("saving '#{self.diskfile}' to Cloud Files")
-            obj = CloudConveyor::Connection.container().create_object(self.disk_filename)
-            obj.load_from_filename(diskfile)
-
-            logger.info("deleting '#{self.diskfile}' from disk")
-            File.delete(diskfile) if !filename.blank? && File.exist?(diskfile)
+            
+            unless CloudConveyor::Connection.container().object_exists?(self.disk_filename)
+              logger.info("saving '#{self.diskfile}' to Cloud Files")
+              obj = CloudConveyor::Connection.container().create_object(self.disk_filename)
+              obj.load_from_filename(self.diskfile)
+            end
+            
+            if disk_filename.present? && File.exist?(self.diskfile)
+              logger.info("deleting '#{self.diskfile}' from disk")
+              File.delete(self.diskfile)
+            end
           end
 
           # Don't save the content type if it's longer than the authorized length
@@ -51,9 +56,13 @@ module CloudConveyor
           end
         end
         
-        def after_destroy
+        def delete_from_disk
           logger.info("deleting #{self.disk_filename} from Cloud Files")
-          CloudConveyor::Connection.container().delete_object(self.disk_filename)
+          begin
+            CloudConveyor::Connection.container().delete_object(self.disk_filename)
+          rescue NoSuchObjectException => e
+            logger.info(e)
+          end
         end
         
         def readable?
