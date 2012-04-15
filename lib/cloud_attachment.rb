@@ -26,31 +26,33 @@ module CloudConveyor
         unloadable # Send unloadable so it will not be unloaded in development
 
         def files_to_final_location
-          if @temp_file && (@temp_file.size > 0)
-            logger.info("saving '#{self.diskfile}' temporarily to disk")
-            md5 = Digest::MD5.new
-            File.open(diskfile, "wb") do |f| 
-              buffer = ""
-              while (buffer = @temp_file.read(8192))
-                f.write(buffer)
-                md5.update(buffer)
+          unless CloudConveyor::Connection.container().object_exists?(self.disk_filename)
+            if @temp_file && (@temp_file.size > 0)
+              logger.info("saving '#{self.diskfile}' temporarily to disk")
+              md5 = Digest::MD5.new
+              File.open(diskfile, "wb") do |f| 
+                buffer = ""
+                while (buffer = @temp_file.read(8192))
+                  f.write(buffer)
+                  md5.update(buffer)
+                  logger.info("MD5 Buffer '#{md5.hexdigest}'")
+                end
               end
-            end
-            self.digest = md5.hexdigest
+              self.digest = md5.hexdigest
             
-            unless CloudConveyor::Connection.container().object_exists?(self.disk_filename)
               logger.info("saving '#{self.diskfile}' to Cloud Files")
               obj = CloudConveyor::Connection.container().create_object(self.disk_filename)
-              obj.load_from_filename(self.diskfile)
-            end
+              success = obj.load_from_filename(self.diskfile)
             
-            if disk_filename.present? && File.exist?(self.diskfile)
-              logger.info("deleting '#{self.diskfile}' from disk")
-              File.delete(self.diskfile)
+              if success && disk_filename.present? && File.exist?(self.diskfile)
+                logger.info("deleting '#{self.diskfile}' from disk")
+                File.delete(self.diskfile)
+              end
             end
           end
-
+          
           # Don't save the content type if it's longer than the authorized length
+          logger.info("self.content_type=  '#{self.content_type}'")
           if self.content_type && self.content_type.length > 255
             self.content_type = nil
           end
