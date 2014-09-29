@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require 'cloudfiles'
+require 'erb'
 module CloudConveyor
   class Connection
     @@api_key           = nil
@@ -27,7 +28,7 @@ module CloudConveyor
     @@container         = nil
     
     def self.init()
-      options = YAML::load( File.open(File.join(Rails.root, 'config', 'cloud_conveyor.yml')) )
+      options = YAML::load(ERB.new(File.open(File.join(Rails.root, 'config', 'cloud_conveyor.yml')).result))
       @@api_key = options[Rails.env]['api_key']
       @@username  = options[Rails.env]['username']
       @@container_name = options[Rails.env]['container_name']
